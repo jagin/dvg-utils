@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+
+from dvgutils import setup_logger
+from dvgutils.commands import images_to_video, video_to_images, plot_metrics
+
+
+def parse_args():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="DeepVisionGuru commands")
+    subparsers = parser.add_subparsers(title="subcommands")
+
+    # video_to_images subcommand
+    v2i_parser = subparsers.add_parser("video_to_images", aliases=["v2i"],
+                                       help="Convert video to set of frame images")
+    v2i_input_group = v2i_parser.add_mutually_exclusive_group(required=True)
+    v2i_input_group.add_argument("-i", "--input", type=str,
+                                 help="path to the input video file")
+    v2i_input_group.add_argument("-c", "--conf", type=str,
+                                 help="Path to the input configuration file")
+    v2i_parser.add_argument("-o", "--output", default="output",
+                            help="path to output directory (default: output")
+    v2i_parser.add_argument("-ie", "--image-ext", default="jpg", choices=["jpg", "png"],
+                            help="valid image extension (default: jpg)")
+    v2i_parser.add_argument('--no-progress', dest='progress', action='store_false',
+                        help="hide progress info")
+    v2i_parser.add_argument('--display', action='store_true',
+                        help="display video results")
+    v2i_parser.set_defaults(command=video_to_images)
+
+    # images_to_video subcommand
+    i2v_parser = subparsers.add_parser("images_to_video", aliases=["i2v"],
+                                       help="Convert set of frame images to video")
+    i2v_parser.add_argument("-i", "--input", required=True, type=str,
+                            help="images input path")
+    i2v_parser.add_argument("-o", "--output", required=True, type=str,
+                            help="output video file name")
+    i2v_parser.add_argument("-ie", "--image-ext", default="jpg", choices=["jpg", "png"],
+                            help="image extension (default: jpg)")
+    i2v_parser.add_argument("--fps", default=30,
+                            help="output video fps (default: 30)")
+    i2v_parser.add_argument("-c", "--codec", default="MJPG",
+                            help="codec of output video (default: MJPG)")
+    i2v_parser.add_argument('--no-progress', dest='progress', action='store_false',
+                        help="hide progress info")
+    i2v_parser.add_argument('--display', action='store_true',
+                        help="display video results")
+    i2v_parser.set_defaults(command=images_to_video)
+
+    # plot_metrics subcommand
+    pm_parser = subparsers.add_parser("plot_metrics", aliases=["pm"],
+                                       help="Plot metrics")
+    pm_parser.add_argument("-i", "--input", required=True, type=str, action="append",
+                           help="list of metrics input path")
+    pm_parser.add_argument("-c", "--chart", default="iter", choices=["iter", "ips", "spi"])
+    pm_parser.set_defaults(command=plot_metrics)
+
+    # Check if command is present
+    args = vars(parser.parse_args())
+    if "command" not in args:
+        parser.print_help()
+        exit(1)
+
+    return args
+
+
+if __name__ == "__main__":
+    setup_logger()
+
+    args = parse_args()
+    # Execute selected command
+    args["command"](args)

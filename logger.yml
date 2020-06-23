@@ -1,0 +1,41 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: "[%(asctime)s] %(threadName)s %(name)s %(levelname)s: %(message)s"
+    #format: "[%(asctime)s] %(filename)s:%(lineno)s %(funcName)s() %(levelname)s: %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  minimal:
+    format: "%(levelname)s: %(message)s"
+handlers:
+  console:
+    #class: logging.StreamHandler
+    class: dvgutils.logger.TqdmStreamHandler
+    level: DEBUG
+    formatter: minimal
+    #stream: ext://sys.stdout
+
+  log_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: simple
+    filename: dvgutils.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+loggers:
+  dvgutils:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+  __main__:
+    level: INFO
+    handlers:
+      - console
+    propagate: false
+root:
+  level: INFO
+  handlers:
+    - console
