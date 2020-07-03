@@ -5,7 +5,7 @@ A set of tools to help you easily build your image and video processing pipeline
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
 ### Prerequisites
 
@@ -44,11 +44,11 @@ Convert set of frame images to a video file:
     
     $ python ./examples/detect_face_image.py -i assets/images/friends --pipeline
     
-    $ python ./examples/detect_face_video.py --metrics output/metrics.json
+    $ python ./examples/detect_face_video.py --metrics output/metrics.csv
     
-    $ python ./examples/detect_face_video.py --pipeline --metrics output/metrics_pipeline.json
+    $ python ./examples/detect_face_video.py --pipeline --metrics output/metrics_pipeline.csv
     
-    $ dvg-utils pm --input output/metrics.json --input output/metrics_pipeline.json 
+    $ dvg-utils pm --input output/metrics.csv --input output/metrics_pipeline.csv 
 
 ## License
 

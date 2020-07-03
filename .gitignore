@@ -9,6 +9,9 @@ __pycache__/
 *.py[cod]
 *.class
 
+# Distribution / packaging
+*.egg-info/
+
 # Project dependant
 output/
 *.log

@@ -21,6 +21,13 @@ class Pipeline:
 
         return self
 
+    def iter(self, pipe):
+        if pipe:
+            self.pipeline = pipe(self.pipeline)
+            self.pipes.append(pipe)
+
+        return self
+
     def run(self):
         for _ in self.pipeline:
             pass
