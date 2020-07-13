@@ -29,6 +29,9 @@ class VisualizeDataPipe:
         if "face_locations" in self.conf and self.conf["face_locations"]:
             self.visualize_face_locations(data)
 
+        if "motion_locations" in self.conf and self.conf["motion_locations"]:
+            self.visualize_motion_locations(data)
+
         if "detected_object_locations" in self.conf and self.conf["detected_object_locations"]:
             self.visualize_detected_object_locations(data)
 
@@ -61,6 +64,29 @@ class VisualizeDataPipe:
             cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
             rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
 
+<<<<<<< examples/pipeline/visualize_data_pipe.py
+    def visualize_motion_locations(self, data):
+        vis_image = data[self.image_key]
+        occupied = data["occupied"]
+        motion_locations = data["motion_locations"]
+
+        # Visualize data
+        #
+        text = ""
+        if occupied == 1:
+            for location in motion_locations:
+                (x1, y1, x2, y2) = location
+                cv2.rectangle(vis_image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                text = "Occupied"
+
+        else:
+            text = "Empty"
+
+        # draw the text and timestamp on the frame
+        cv2.putText(vis_image, "Room Status: {}".format(text), (10, 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+=======
     def visualize_detected_object_locations(self, data):
         vis_image = data[self.image_key]
         detected_object_locations = data["detected_object_locations"]
@@ -109,3 +135,4 @@ class VisualizeDataPipe:
             text = "{}: {}".format(k, v)
             put_text(vis_image, text, (10, h - ((i * 20) + 20)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+>>>>>>> examples/pipeline/visualize_data_pipe.py
