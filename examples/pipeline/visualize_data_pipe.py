@@ -64,7 +64,6 @@ class VisualizeDataPipe:
             cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
             rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
 
-<<<<<<< examples/pipeline/visualize_data_pipe.py
     def visualize_motion_locations(self, data):
         vis_image = data[self.image_key]
         occupied = data["occupied"]
@@ -86,7 +85,6 @@ class VisualizeDataPipe:
         cv2.putText(vis_image, "Room Status: {}".format(text), (10, 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-=======
     def visualize_detected_object_locations(self, data):
         vis_image = data[self.image_key]
         detected_object_locations = data["detected_object_locations"]
@@ -135,4 +133,3 @@ class VisualizeDataPipe:
             text = "{}: {}".format(k, v)
             put_text(vis_image, text, (10, h - ((i * 20) + 20)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
->>>>>>> examples/pipeline/visualize_data_pipe.py
