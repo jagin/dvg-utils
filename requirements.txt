@@ -1,3 +1,4 @@
+dlib
 tqdm
 pyyaml
 numpy

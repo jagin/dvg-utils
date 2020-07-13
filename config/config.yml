@@ -3,7 +3,7 @@ videoCapture:
   capture: file
 
   file:
-    src: assets/videos/faces.small.mp4
+    src: assets/videos/people_walking.mp4
 
   # For src as a camera index you can check the camera capabilities running:
   #   v4l2-ctl --list-formats-ext -d /dev/video{src}
@@ -55,3 +55,17 @@ faceDetector:
   caffe:
     prototxt: models/res10_300x300_ssd_iter_140000_fp16.prototxt
     model: models/res10_300x300_ssd_iter_140000_fp16.caffemodel
+
+# People counter settings
+peopleCounter:
+  model: caffe
+  caffe:
+    prototxt: models/MobileNetSSD_deploy.prototxt
+    model: models/MobileNetSSD_deploy.caffemodel
+
+# Object detector settings
+objectDetector:
+  model: caffe
+  caffe:
+    prototxt: models/MobileNetSSD_deploy.prototxt
+    model: models/MobileNetSSD_deploy.caffemodel
