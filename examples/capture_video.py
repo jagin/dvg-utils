@@ -1,18 +1,18 @@
 import logging
+import time
 
 from dvgutils import setup_logger, load_config, colors
 from dvgutils.vis import put_text
 from dvgutils.modules import VideoCapture, ShowImage, Metrics, SaveVideo, Progress
-from dvgutils.pipeline import observable, Pipeline, \
-    CaptureVideoPipe, ShowImagePipe, SaveVideoPipe, MetricsPipe, ProgressPipe
+from dvgutils.pipeline import Pipeline, CaptureVideoPipe, ShowImagePipe, SaveVideoPipe, MetricsPipe, ProgressPipe
 
 
 def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-cf", "--conf", default="config/config.yml",
-                        help="Path to the input configuration file (default: config/config.yml)")
+    parser.add_argument("-cf", "--conf", default="config/capture_video.yml",
+                        help="Path to the input configuration file (default: config/capture_video.yml)")
     parser.add_argument("-o", "--output", type=str,
                         help="output video file name")
     parser.add_argument("--no-display", dest='display', action="store_false",
@@ -21,10 +21,23 @@ def parse_args():
                         help="don't display progress")
     parser.add_argument("--pipeline", action="store_true",
                         help="run as pipeline")
+    parser.add_argument("--metrics", type=str,
+                        help="metrics file name")
     parser.add_argument("--fps", type=int,
                         help="output video fps")
 
     return vars(parser.parse_args())
+
+
+def visualize_frame_info(vis_image, frame_num, fps):
+    h, w = vis_image.shape[:2]
+
+    # Visualize frame number
+    put_text(vis_image, f"{frame_num}", (w, h), org_pos="br",
+             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+    # Visualize FPS
+    put_text(vis_image, f"{fps:.2f} fps", (0, h), org_pos="bl",
+             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
 
 
 def capture_video(args):
@@ -41,21 +54,21 @@ def capture_video(args):
 
     try:
         logger.info("Capturing...")
+
+        idx = 0
+        start_time = time.perf_counter()
         while True:
             # Grab the frame
             frame = video_capture.read()
             if frame is None:
                 break
+            # Calculate FPS
+            fps = (idx + 1) / (time.perf_counter() - start_time)
 
             # Visualize data
             #
-            # FPS
-            put_text(frame, f"{metrics.iter_per_sec():.2f} fps", (2, 2), org_pos="tl",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-            # Frame number
-            h, w = frame.shape[:2]
-            put_text(frame, f"frame: {len(metrics)}", (w - 2, 2), org_pos="tr",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+            # Metrics
+            visualize_frame_info(frame, idx, fps)
 
             if save_video:
                 save_video(frame)
@@ -68,10 +81,17 @@ def capture_video(args):
             metrics.update()
             progress.update()
 
+            idx += 1
+
         logger.info(f"{len(metrics)} it, "
                     f"{metrics.elapsed():.3f} s, "
                     f"{metrics.sec_per_iter():.3f} s/it, "
                     f"{metrics.iter_per_sec():.2f} it/s")
+
+        if args["metrics"]:
+            metrics.save(args["metrics"])
+            logger.info(f"Metrics saved to {args['metrics']}")
+
     except KeyboardInterrupt:
         logger.warning("Got Ctrl+C!")
     finally:
@@ -85,11 +105,6 @@ def capture_video(args):
 class VisualizeDataPipe:
     def __init__(self, image_key="vis_image"):
         self.image_key = image_key
-        self.metrics = None
-        observable.register("metrics", self, self.on_metrics)
-
-    def on_metrics(self, metrics):
-        self.metrics = metrics
 
     def __call__(self, data):
         return self.visualize(data)
@@ -97,18 +112,17 @@ class VisualizeDataPipe:
     def visualize(self, data):
         vis_image = data["image"].copy()
         data[self.image_key] = vis_image
-        h, w = vis_image.shape[:2]
 
-        if self.metrics:
-            # Visualize FPS
-            put_text(vis_image, f"{self.metrics['iter_per_sec']:.2f} fps", (2, 2), org_pos="tl",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-
-            # Visualize frame number
-            put_text(vis_image, f"frame: {self.metrics['iteration']}", (w - 2, 2), org_pos="tr",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+        self.visualize_frame_info(data)
 
         return data
+
+    def visualize_frame_info(self, data):
+        vis_image = data[self.image_key]
+        frame_num = data["idx"]
+        fps = data["fps"]
+
+        visualize_frame_info(vis_image, frame_num, fps)
 
 
 def capture_video_pipeline(args):
@@ -141,6 +155,10 @@ def capture_video_pipeline(args):
                     f"{metrics_pipe.metrics.elapsed():.3f} s, "
                     f"{metrics_pipe.metrics.sec_per_iter():.3f} s/it, "
                     f"{metrics_pipe.metrics.iter_per_sec():.2f} it/s")
+
+        if args["metrics"]:
+            metrics_pipe.metrics.save(args["metrics"])
+            logger.info(f"Metrics saved to {args['metrics']}")
     except KeyboardInterrupt:
         logger.warning("Got Ctrl+C!")
     finally:

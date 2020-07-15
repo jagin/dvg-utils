@@ -1,0 +1,8 @@
+faceDetector:
+  model: cascade
+
+  cascade:
+    classifier: models/haarcascade_frontalface_default.xml
+  caffe:
+    prototxt: models/res10_300x300_ssd_iter_140000_fp16.prototxt
+    model: models/res10_300x300_ssd_iter_140000_fp16.caffemodel

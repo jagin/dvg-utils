@@ -13,6 +13,6 @@ class DetectObjectPipe:
         image = data["image"]
 
         # Detect faces
-        data["detected_object_locations"] = self.detector.detect(image)
+        data["object_locations"] = self.detector.detect(image)
 
         return data

@@ -12,7 +12,7 @@ class DetectMotionPipe:
     def detect(self, data):
         image = data["image"]
 
-        # Detect faces
-        data["occupied"], data["motion_locations"] = self.detector.detect(image)
+        # Detect motion locations
+        data["motion_locations"] = self.detector.detect(image)
 
         return data

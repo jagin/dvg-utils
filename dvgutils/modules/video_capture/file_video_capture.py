@@ -64,7 +64,7 @@ class FileVideoCapture:
             if isinstance(self.end_frame, str):
                 self.end_frame = int(str_to_sec(self.end_frame) * self.fps)
             # Check frame range
-            if not 1 < self.start_frame < self.frame_count:
+            if not 1 <= self.start_frame < self.frame_count:
                 self.logger.warning(f"Start frame {self.start_frame} out of range (1, {self.frame_count - 1})")
                 self.logger.warning("Resetting start frame to 1")
                 self.start_frame = 1

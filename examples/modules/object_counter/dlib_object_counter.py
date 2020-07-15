@@ -47,7 +47,7 @@ class DlibObjectCounter:
 
         # check to see if we should run a more computationally expensive
         # object detection method to aid our tracker
-        if detected_object_locations is not None:
+        if detected_object_locations:
             # initialize our new set of object trackers
             self.trackers = []
 

@@ -8,7 +8,7 @@ class ObjectCounter:
             self.detector = OpencvObjectCounter(conf["max_disappeared"], conf["max_distance"],
                                                 conf["opencv"]["tracker_type"])
         else:
-            raise RuntimeError(f"ObjectCounter not initialized. Unknown tracker {conf['dlib']}!")
+            raise RuntimeError(f"ObjectCounter not initialized. Unknown tracker {conf['tracker']}!")
 
     def detect(self, image, detected_object_locations):
         return self.detector.detect(image, detected_object_locations)

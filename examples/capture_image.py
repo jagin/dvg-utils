@@ -21,12 +21,18 @@ def parse_args():
                         help="path to output directory")
     parser.add_argument("--no-display", dest='display', action="store_false",
                         help="hide display window")
-    parser.add_argument('--progress', action='store_true',
-                        help="show progress info")
+    parser.add_argument("--no-progress", dest="progress", action="store_false",
+                        help="don't display progress")
     parser.add_argument("--pipeline", action="store_true",
                         help="run as pipeline")
 
     return vars(parser.parse_args())
+
+
+def visualize_image_info(vis_image, filename):
+    # Visualize image filename
+    put_text(vis_image, filename, (0, 0), org_pos="tl",
+             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
 
 
 def capture_image(args):
@@ -56,9 +62,10 @@ def capture_image(args):
             # Getting the name of the file without the extension
             name = os.path.splitext(filename)[0]
 
+            # Visualize data
+            #
             # Visualize image filename
-            put_text(image, filename, (2, 2), org_pos="tl",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+            visualize_image_info(image, filename)
 
             if save_image:
                 save_image(image, name)
@@ -94,13 +101,16 @@ class VisualizeDataPipe:
     def visualize(self, data):
         vis_image = data["image"].copy()
         data[self.image_key] = vis_image
-        filename = data["filename"]
 
-        # Visualize image filename
-        put_text(vis_image, filename, (2, 2), org_pos="tl",
-                 bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+        self.visualize_image_info(data)
 
         return data
+
+    def visualize_image_info(self, data):
+        vis_image = data[self.image_key]
+        filename = data["filename"]
+
+        visualize_image_info(vis_image, filename)
 
 
 def capture_image_pipeline(args):

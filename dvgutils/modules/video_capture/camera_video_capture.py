@@ -103,7 +103,7 @@ class CameraVideoCaptureThreaded(CameraVideoCapture):
             frame = super().read()
 
             if not self.queue.full():
-                # add the frames to the queue
+                # Add the frames to the queue
                 self.queue.put(frame)
 
                 if frame is None:
@@ -112,13 +112,13 @@ class CameraVideoCaptureThreaded(CameraVideoCapture):
                 time.sleep(0.01)  # Rest for 1ms, we have a full queue
 
     def read(self):
-        # return next frame in the queue
+        # Return next frame in the queue
         return self.queue.get()
 
     def close(self):
-        # indicate that the thread should be stopped
+        # Indicate that the thread should be stopped
         self.stopped = True
-        # wait until stream resources are released (producer thread might be still grabbing frame)
+        # Wait until stream resources are released (producer thread might be still grabbing frame)
         self.thread.join()
         # Close the video capture
         super().close()
