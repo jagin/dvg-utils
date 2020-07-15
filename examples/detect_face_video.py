@@ -1,4 +1,5 @@
 import logging
+import time
 
 import cv2
 
@@ -9,18 +10,14 @@ from dvgutils.pipeline import CaptureVideoPipe, MetricsPipe, Pipeline, ShowImage
 
 from modules.face_detector import FaceDetector
 from pipeline.detect_face_pipe import DetectFacePipe
-from pipeline.visualize_data_pipe import VisualizeDataPipe
 
 
 def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-cf", "--conf", default="config/config.yml",
-                        help="Path to the input configuration file (default: config/config.yml)")
-    parser.add_argument("-cl", "--classifier", default="models/haarcascade_frontalface_default.xml",
-                        help="path to where the face cascade resides "
-                             "(default: models/haarcascade_frontalface_default.xml")
+    parser.add_argument("-cf", "--conf", default="config/detect_face_video.yml",
+                        help="Path to the input configuration file (default: config/detect_face_video.yml)")
     parser.add_argument("-o", "--output", type=str,
                         help="output video file name")
     parser.add_argument("--no-display", dest='display', action="store_false",
@@ -35,6 +32,25 @@ def parse_args():
                         help="output video fps")
 
     return vars(parser.parse_args())
+
+
+def visualize_frame_info(vis_image, frame_num, fps):
+    h, w = vis_image.shape[:2]
+
+    # Visualize frame number
+    put_text(vis_image, f"{frame_num}", (w, h), org_pos="br",
+             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+    # Visualize FPS
+    put_text(vis_image, f"{fps:.2f} fps", (0, h), org_pos="bl",
+             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+
+
+def visualize_face_locations(vis_image, face_locations):
+    # Visualize face locations
+    for face_location in face_locations:
+        (start_x, start_y, end_x, end_y) = face_location[0:4]
+        cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
+        rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
 
 
 def detect_face(args):
@@ -52,29 +68,26 @@ def detect_face(args):
 
     try:
         logger.info("Capturing...")
+
+        idx = 0
+        start_time = time.perf_counter()
         while True:
             # Grab the frame
             frame = video_capture.read()
             if frame is None:
                 break
+            # Calculate FPS
+            fps = (idx + 1) / (time.perf_counter() - start_time)
 
             # Detect faces
             face_locations = face_detector.detect(frame)
 
             # Visualize data
             #
-            # FPS
-            put_text(frame, f"{metrics.iter_per_sec():.2f} fps", (2, 2), org_pos="tl",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-            # Frame number
-            h, w = frame.shape[:2]
-            put_text(frame, f"frame: {len(metrics)}", (w - 2, 2), org_pos="tr",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-            # Face bounding boxes
-            for face_location in face_locations:
-                (start_x, start_y, end_x, end_y) = face_location[0:4]
-                cv2.rectangle(frame, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
-                rectangle_overlay(frame, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
+            # Visualize image filename
+            visualize_frame_info(frame, idx, fps)
+            # Visualize face locations
+            visualize_face_locations(frame, face_locations)
 
             if save_video:
                 save_video(frame)
@@ -86,6 +99,8 @@ def detect_face(args):
 
             metrics.update()
             progress.update()
+
+            idx += 1
 
         logger.info(f"{len(metrics)} it, "
                     f"{metrics.elapsed():.3f} s, "
@@ -106,16 +121,42 @@ def detect_face(args):
         video_capture.close()
 
 
+class VisualizeDataPipe:
+    def __init__(self, image_key="vis_image"):
+        self.image_key = image_key
+
+    def __call__(self, data):
+        return self.visualize(data)
+
+    def visualize(self, data):
+        vis_image = data["image"].copy()
+        data[self.image_key] = vis_image
+
+        self.visualize_frame_info(data)
+        self.visualize_face_locations(data)
+
+        return data
+
+    def visualize_frame_info(self, data):
+        vis_image = data[self.image_key]
+        frame_num = data["idx"]
+        fps = data["fps"]
+
+        visualize_frame_info(vis_image, frame_num, fps)
+
+    def visualize_face_locations(self, data):
+        vis_image = data[self.image_key]
+        face_locations = data["face_locations"]
+
+        visualize_face_locations(vis_image, face_locations)
+
 def detect_face_pipeline(args):
     logger = logging.getLogger(__name__)
     conf = load_config(args["conf"])
 
     # Setup pipeline steps
     capture_video_pipe = CaptureVideoPipe(conf["videoCapture"])
-    visualize_data_pipe = VisualizeDataPipe("vis_image", {
-        "metrics": True,
-        "face_locations": True
-    })
+    visualize_data_pipe = VisualizeDataPipe("vis_image")
     detect_face_pipe = DetectFacePipe(conf["faceDetector"])
     video_fps = args["fps"] if args["fps"] is not None else capture_video_pipe.video_capture.fps
     save_video_pipe = SaveVideoPipe("vis_image", args["output"], fps=video_fps) if args["output"] else None

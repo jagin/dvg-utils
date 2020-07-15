@@ -1,3 +1,5 @@
+import time
+
 from ..modules import VideoCapture
 from .observable import observable
 
@@ -22,11 +24,13 @@ class CaptureVideoPipe:
 
     def generator(self):
         idx = 0
+        _start_time = time.perf_counter()
         while not self.stop:
             image = self.video_capture.read()
             if image is not None:
                 data = {
                     "idx": idx,
+                    "fps": (idx + 1) / (time.perf_counter() - _start_time),
                     "name": f"{idx:06d}",
                     "image": image
                 }

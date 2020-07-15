@@ -16,8 +16,8 @@ def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-cf", "--conf", default="config/config.yml",
-                        help="Path to the input configuration file (default: config/config.yml)")
+    parser.add_argument("-cf", "--conf", default="config/detect_face_image.yml",
+                        help="Path to the input configuration file (default: config/detect_face_image.yml)")
     parser.add_argument("-i", "--input", required=True, type=str,
                         help="image file or images input path")
     parser.add_argument("-ie", "--image-ext", default="jpg", choices=["jpg", "png"],
@@ -34,6 +34,20 @@ def parse_args():
                         help="run as pipeline")
 
     return vars(parser.parse_args())
+
+
+def visualize_image_info(vis_image, filename):
+    # Visualize image filename
+    put_text(vis_image, filename, (0, 0), org_pos="tl",
+             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
+
+
+def visualize_face_locations(vis_image, face_locations):
+    # Visualize face locations
+    for face_location in face_locations:
+        (start_x, start_y, end_x, end_y) = face_location[0:4]
+        cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
+        rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
 
 
 def detect_face(args):
@@ -70,14 +84,10 @@ def detect_face(args):
 
             # Visualize data
             #
-            # Image filename
-            put_text(image, filename, (2, 2), org_pos="tl",
-                     bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-            # Face bounding boxes
-            for face_location in face_locations:
-                (start_x, start_y, end_x, end_y) = face_location[0:4]
-                cv2.rectangle(image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
-                rectangle_overlay(image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
+            # Visualize image filename
+            visualize_image_info(image, filename)
+            # Visualize face locations
+            visualize_face_locations(image, face_locations)
 
             if save_image:
                 save_image(image, name)
@@ -113,20 +123,23 @@ class VisualizeDataPipe:
     def visualize(self, data):
         vis_image = data["image"].copy()
         data[self.image_key] = vis_image
-        filename = data["filename"]
-        face_locations = data["face_locations"]
 
-        # Image filename
-        put_text(vis_image, filename, (2, 2), org_pos="tl",
-                 bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-        # Face bounding boxes
-        for face_location in face_locations:
-            (start_x, start_y, end_x, end_y) = face_location[0:4]
-            cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
-            rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
+        self.visualize_image_info(data)
+        self.visualize_face_locations(data)
 
         return data
 
+    def visualize_image_info(self, data):
+        vis_image = data[self.image_key]
+        filename = data["filename"]
+
+        visualize_image_info(vis_image, filename)
+
+    def visualize_face_locations(self, data):
+        vis_image = data[self.image_key]
+        face_locations = data["face_locations"]
+
+        visualize_face_locations(vis_image, face_locations)
 
 def detect_face_pipeline(args):
     logger = logging.getLogger(__name__)
