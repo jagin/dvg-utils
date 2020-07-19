@@ -1,11 +1,11 @@
 import logging
-import cv2
 
-from dvgutils import setup_logger, load_config, colors
-from dvgutils.vis import put_text
+from dvgutils import setup_logger, load_config
 from dvgutils.pipeline import CaptureVideoPipe, MetricsPipe, Pipeline, ShowImagePipe, SaveVideoPipe, ProgressPipe
 
+from utils.vis import visualize_frame_info, visualize_object_counter, visualize_tracked_object_locations
 from pipeline.count_object_pipe import CountObjectPipe
+from pipeline.track_object_pipe import TrackObjectPipe
 from pipeline.detect_object_pipe import DetectObjectPipe
 
 
@@ -29,51 +29,6 @@ def parse_args():
     return vars(parser.parse_args())
 
 
-def visualize_frame_info(vis_image, frame_num, fps):
-    h, w = vis_image.shape[:2]
-    # Visualize frame number
-    put_text(vis_image, f"{frame_num}", (w, h), org_pos="br",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-    # Visualize FPS
-    put_text(vis_image, f"{fps:.2f} fps", (0, h), org_pos="bl",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-
-
-def visualize_tracked_object_locations(vis_image, tracked_object_locations, object_count):
-    h, w = vis_image.shape[:2]
-    (objects_up, objects_down) = object_count
-
-    # draw a horizontal line in the center of the frame -- once an
-    # object crosses this line we will determine whether they were
-    # moving 'up' or 'down'
-    cv2.line(vis_image, (0, h // 2), (w, h // 2), colors.get("red").bgr(), 2)
-
-    # loop over the tracked objects
-    for object_id in tracked_object_locations:
-        (x_coord, y_coord) = tracked_object_locations[object_id]
-
-        # draw both the ID of the object and the centroid of the
-        # object on the output frame
-        text = "Id {}".format(object_id)
-        put_text(vis_image, text, (x_coord, y_coord), org_pos="bl",
-                 color=colors.get("white").bgr(), bg_color=colors.get("green").bgr(),
-                 bg_alpha=0.5)
-        cv2.circle(vis_image, (x_coord, y_coord), 4, colors.get("green").bgr(), -1)
-
-    # construct a tuple of information we will be displaying on the
-    # frame
-    info = [
-        ("Up", objects_up),
-        ("Down", objects_down),
-    ]
-
-    # loop over the info tuples and draw them on our frame
-    for (i, (k, v)) in enumerate(info):
-        text = "{}: {}".format(k, v)
-        put_text(vis_image, text, (0, ((i * 22) + 20)), org_pos="bl",
-                 bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-
-
 class VisualizeDataPipe:
     def __init__(self, image_key="vis_image"):
         self.image_key = image_key
@@ -86,6 +41,7 @@ class VisualizeDataPipe:
         data[self.image_key] = vis_image
 
         self.visualize_frame_info(data)
+        self.visualize_object_counter(data)
         self.visualize_tracked_object_locations(data)
 
         return data
@@ -97,12 +53,18 @@ class VisualizeDataPipe:
 
         visualize_frame_info(vis_image, frame_num, fps)
 
+    def visualize_object_counter(self, data):
+        vis_image = data[self.image_key]
+        crossed_in_out = data["crossed_in_out"]
+        lines = data["line"]
+
+        visualize_object_counter(vis_image, crossed_in_out, lines)
+
     def visualize_tracked_object_locations(self, data):
         vis_image = data[self.image_key]
-        tracked_object_locations = data["tracked_object_locations"]
-        object_count = data["object_count"]
+        tracked_objects = data["tracked_objects"]
 
-        visualize_tracked_object_locations(vis_image, tracked_object_locations, object_count)
+        visualize_tracked_object_locations(vis_image, tracked_objects)
 
 
 def count_object(args):
@@ -113,6 +75,7 @@ def count_object(args):
     capture_video_pipe = CaptureVideoPipe(conf["videoCapture"])
     visualize_data_pipe = VisualizeDataPipe("vis_image")
     object_detector_pipe = DetectObjectPipe(conf["objectDetector"])
+    track_object_pipe = TrackObjectPipe(conf["objectTracker"])
     count_object_pipe = CountObjectPipe(conf["objectCounter"])
     video_fps = args["fps"] if args["fps"] is not None else capture_video_pipe.video_capture.fps
     save_video_pipe = SaveVideoPipe("vis_image", args["output"], fps=video_fps) if args["output"] else None
@@ -123,6 +86,7 @@ def count_object(args):
     # Create pipeline
     pipeline = Pipeline(capture_video_pipe)
     pipeline.map(object_detector_pipe)
+    pipeline.map(track_object_pipe)
     pipeline.map(count_object_pipe)
     pipeline.map(visualize_data_pipe)
     pipeline.map(save_video_pipe)

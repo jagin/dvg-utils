@@ -4,16 +4,15 @@ from modules.object_counter import ObjectCounter
 class CountObjectPipe:
 
     def __init__(self, conf):
-        self.detector = ObjectCounter(conf)
+        self.counter = ObjectCounter(conf)
 
     def __call__(self, data):
         return self.detect(data)
 
     def detect(self, data):
-        image = data["image"]
-        object_locations = data["object_locations"]
+        tracked_objects = data["tracked_objects"]
 
         # Detect faces
-        data["tracked_object_locations"], data["object_count"] = self.detector.detect(image, object_locations)
+        data["crossed_in_out"], data["line"] = self.counter.count(tracked_objects)
 
         return data
