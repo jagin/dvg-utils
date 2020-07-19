@@ -33,13 +33,15 @@ immediately available to other users of the package on our system:
 
 ## Running tests
 
+Running tests requires `pytest` package to be installed.
+
     $ make test
     
 ## Command line utils
 
 Convert a video file to set of images:
 
-    $ dvg-utils v2i -i assets/videos/faces.small.mp4 -o output --display
+    $ dvg-utils v2i -i assets/videos/faces.mp4 -o output --display
     
 Convert set of frame images to a video file:
 

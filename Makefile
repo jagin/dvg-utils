@@ -14,6 +14,4 @@ test:
 
 dist: clean
 	python setup.py sdist
-
-upload_test:
-	twine upload –repository testpypi dist/*
+	twine upload --repository pypi dist/*

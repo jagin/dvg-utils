@@ -1,7 +1,8 @@
 import logging
 
 from dvgutils import load_config
-from dvgutils.modules import StreamVideoCaptureThreaded, VideoCapture, ShowImage, SaveImage, Metrics, Progress
+from dvgutils.modules import VideoCapture, ShowImage, SaveImage, Metrics, Progress
+from dvgutils.modules.video_capture import StreamVideoCaptureThreaded
 
 
 def video_to_images(args):
