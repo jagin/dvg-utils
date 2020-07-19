@@ -35,12 +35,15 @@ objectDetector:
     prototxt: models/MobileNetSSD_deploy.prototxt
     model: models/MobileNetSSD_deploy.caffemodel
     frame_skip: 20
-    confidence: 0.3
+    confidence: 0.5
     classes: ["person"]
 
-objectCounter:
-  max_disappeared: 40
+objectTracker:
+  max_disappeared: 20
   max_distance: 80
   tracker: opencv
   opencv:
     tracker_type: kcf
+
+objectCounter:
+  line: [10, 220, 290, 120] # x1, y1, x2, y2

@@ -1,11 +1,11 @@
 import os
 import logging
 
-from dvgutils import setup_logger, colors
-from dvgutils.vis import put_text
+from dvgutils import setup_logger
 from dvgutils.modules import ImageCapture, ShowImage, SaveImage, Metrics, Progress
 from dvgutils.pipeline import CaptureImagePipe, Pipeline, ShowImagePipe, SaveImagePipe, MetricsPipe, ProgressPipe
 
+from utils.vis import visualize_image_info
 
 def parse_args():
     import argparse
@@ -27,12 +27,6 @@ def parse_args():
                         help="run as pipeline")
 
     return vars(parser.parse_args())
-
-
-def visualize_image_info(vis_image, filename):
-    # Visualize image filename
-    put_text(vis_image, filename, (0, 0), org_pos="tl",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
 
 
 def capture_image(args):

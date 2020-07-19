@@ -1,13 +1,11 @@
 import logging
 import os
 
-import cv2
-
-from dvgutils import setup_logger, load_config, colors
-from dvgutils.vis import put_text, rectangle_overlay
+from dvgutils import setup_logger, load_config
 from dvgutils.modules import ImageCapture, ShowImage, SaveImage, Metrics, Progress
 from dvgutils.pipeline import CaptureImagePipe, Pipeline, ShowImagePipe, SaveImagePipe, MetricsPipe, ProgressPipe
 
+from utils.vis import visualize_image_info, visualize_face_locations
 from modules.face_detector import FaceDetector
 from pipeline.detect_face_pipe import DetectFacePipe
 
@@ -34,20 +32,6 @@ def parse_args():
                         help="run as pipeline")
 
     return vars(parser.parse_args())
-
-
-def visualize_image_info(vis_image, filename):
-    # Visualize image filename
-    put_text(vis_image, filename, (0, 0), org_pos="tl",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-
-
-def visualize_face_locations(vis_image, face_locations):
-    # Visualize face locations
-    for face_location in face_locations:
-        (start_x, start_y, end_x, end_y) = face_location[0:4]
-        cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
-        rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
 
 
 def detect_face(args):

@@ -1,0 +1,27 @@
+videoCapture1:
+  capture: camera
+
+  camera:
+    src: 0
+    fourcc: MJPG
+    resolution: [1280, 720]
+    fps: 30
+
+  # Transform video frames
+  transform:
+    # 1 - for removing mirror effect
+    flip: 1  # 0 - vertical, 1 - horizontal, -1 - vertical and horizontal
+
+videoCapture2:
+  capture: camera
+
+  camera:
+    src: 2
+    fourcc: MJPG
+    resolution: [640, 480]
+    fps: 30
+
+  # Transform video frames
+  transform:
+    # 1 - for removing mirror effect
+    flip: 1  # 0 - vertical, 1 - horizontal, -1 - vertical and horizontal

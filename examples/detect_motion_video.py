@@ -1,13 +1,14 @@
 import logging
 import time
 
-from dvgutils import setup_logger, load_config, colors
-from dvgutils.vis import put_text, rectangle_overlay
+from dvgutils import setup_logger, load_config
 from dvgutils.modules import VideoCapture, ShowImage, Metrics, SaveVideo, Progress
 from dvgutils.pipeline import CaptureVideoPipe, MetricsPipe, Pipeline, ShowImagePipe, SaveVideoPipe, ProgressPipe
 
+from utils.vis import visualize_frame_info, visualize_motion_locations
 from modules.motion_detector import MotionDetector
 from pipeline.detect_motion_pipe import DetectMotionPipe
+
 
 def parse_args():
     import argparse
@@ -29,26 +30,6 @@ def parse_args():
                         help="output video fps")
 
     return vars(parser.parse_args())
-
-
-def visualize_frame_info(vis_image, frame_num, fps):
-    h, w = vis_image.shape[:2]
-
-    # Visualize frame number
-    put_text(vis_image, f"{frame_num}", (w, h), org_pos="br",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-    # Visualize FPS
-    put_text(vis_image, f"{fps:.2f} fps", (0, h), org_pos="bl",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-
-
-def visualize_motion_locations(vis_image, motion_locations):
-    if motion_locations:
-        for location in motion_locations:
-            (x1, y1, x2, y2) = location
-            rectangle_overlay(vis_image, (x1, y1), (x2, y2), colors.get("red").bgr(), 0.5)
-        put_text(vis_image, "MOTION DETECTED!", (0, 0), org_pos="tl",
-                 bg_color=colors.get("red").bgr())
 
 
 class VisualizeDataPipe:

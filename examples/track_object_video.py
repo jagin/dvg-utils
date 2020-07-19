@@ -3,7 +3,8 @@ import logging
 from dvgutils import setup_logger, load_config
 from dvgutils.pipeline import CaptureVideoPipe, MetricsPipe, Pipeline, ShowImagePipe, SaveVideoPipe, ProgressPipe
 
-from utils.vis import visualize_frame_info, visualize_object_locations
+from utils.vis import visualize_frame_info, visualize_tracked_object_locations
+from pipeline.track_object_pipe import TrackObjectPipe
 from pipeline.detect_object_pipe import DetectObjectPipe
 
 
@@ -11,8 +12,8 @@ def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-cf", "--conf", default="config/detect_object_video.yml",
-                        help="Path to the input configuration file (default: config/detect_object_video.yml)")
+    parser.add_argument("-cf", "--conf", default="config/track_object_video.yml",
+                        help="Path to the input configuration file (default: config/count_object_video.yml)")
     parser.add_argument("-o", "--output", type=str,
                         help="output video file name")
     parser.add_argument("--no-display", dest='display', action="store_false",
@@ -39,7 +40,7 @@ class VisualizeDataPipe:
         data[self.image_key] = vis_image
 
         self.visualize_frame_info(data)
-        self.visualize_object_locations(data)
+        self.visualize_tracked_object_locations(data)
 
         return data
 
@@ -50,21 +51,22 @@ class VisualizeDataPipe:
 
         visualize_frame_info(vis_image, frame_num, fps)
 
-    def visualize_object_locations(self, data):
+    def visualize_tracked_object_locations(self, data):
         vis_image = data[self.image_key]
-        object_locations = data["object_locations"]
+        tracked_objects = data["tracked_objects"]
 
-        visualize_object_locations(vis_image, object_locations)
+        visualize_tracked_object_locations(vis_image, tracked_objects)
 
 
-def detect_object(args):
+def track_object(args):
     logger = logging.getLogger(__name__)
     conf = load_config(args["conf"])
 
     # Setup pipeline steps
     capture_video_pipe = CaptureVideoPipe(conf["videoCapture"])
     visualize_data_pipe = VisualizeDataPipe("vis_image")
-    detect_object_pipe = DetectObjectPipe(conf["objectDetector"])
+    object_detector_pipe = DetectObjectPipe(conf["objectDetector"])
+    track_object_pipe = TrackObjectPipe(conf["objectTracker"])
     video_fps = args["fps"] if args["fps"] is not None else capture_video_pipe.video_capture.fps
     save_video_pipe = SaveVideoPipe("vis_image", args["output"], fps=video_fps) if args["output"] else None
     show_image_pipe = ShowImagePipe("vis_image", "Video") if args["display"] else None
@@ -73,7 +75,8 @@ def detect_object(args):
 
     # Create pipeline
     pipeline = Pipeline(capture_video_pipe)
-    pipeline.map(detect_object_pipe)
+    pipeline.map(object_detector_pipe)
+    pipeline.map(track_object_pipe)
     pipeline.map(visualize_data_pipe)
     pipeline.map(save_video_pipe)
     pipeline.map(show_image_pipe)
@@ -104,4 +107,4 @@ if __name__ == "__main__":
     setup_logger()
 
     args = parse_args()
-    detect_object(args)
+    track_object(args)

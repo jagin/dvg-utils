@@ -1,13 +1,11 @@
 import logging
 import time
 
-import cv2
-
-from dvgutils import setup_logger, load_config, colors
-from dvgutils.vis import put_text, rectangle_overlay
+from dvgutils import setup_logger, load_config
 from dvgutils.modules import VideoCapture, ShowImage, Metrics, SaveVideo, Progress
 from dvgutils.pipeline import CaptureVideoPipe, MetricsPipe, Pipeline, ShowImagePipe, SaveVideoPipe, ProgressPipe
 
+from utils.vis import visualize_frame_info, visualize_face_locations
 from modules.face_detector import FaceDetector
 from pipeline.detect_face_pipe import DetectFacePipe
 
@@ -32,25 +30,6 @@ def parse_args():
                         help="output video fps")
 
     return vars(parser.parse_args())
-
-
-def visualize_frame_info(vis_image, frame_num, fps):
-    h, w = vis_image.shape[:2]
-
-    # Visualize frame number
-    put_text(vis_image, f"{frame_num}", (w, h), org_pos="br",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-    # Visualize FPS
-    put_text(vis_image, f"{fps:.2f} fps", (0, h), org_pos="bl",
-             bg_color=colors.get("white").bgr(), bg_alpha=0.5)
-
-
-def visualize_face_locations(vis_image, face_locations):
-    # Visualize face locations
-    for face_location in face_locations:
-        (start_x, start_y, end_x, end_y) = face_location[0:4]
-        cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
-        rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
 
 
 def detect_face(args):

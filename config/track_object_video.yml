@@ -2,7 +2,7 @@ videoCapture:
   capture: file
 
   file:
-    src: assets/videos/cars_driving.mp4
+    src: assets/videos/people_walking.mp4
 
   camera:
     src: 0
@@ -27,4 +27,20 @@ videoCapture:
       videoconvert !
       video/x-raw, format=(string)BGR !
       appsink
-    api_preference: CAP_GSTREAMER
+
+objectDetector:
+  model: caffe
+
+  caffe:
+    prototxt: models/MobileNetSSD_deploy.prototxt
+    model: models/MobileNetSSD_deploy.caffemodel
+    frame_skip: 20
+    confidence: 0.5
+    classes: ["person"]
+
+objectTracker:
+  max_disappeared: 20
+  max_distance: 80
+  tracker: opencv
+  opencv:
+    tracker_type: kcf
