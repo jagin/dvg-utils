@@ -6,8 +6,7 @@ import numpy as np
 from .misc import clip_points
 
 
-def resize(image, width=None, height=None,
-           interp=None, pad=False, pad_color=0):
+def resize(image, width=None, height=None, interp=None, pad=False, pad_color=0):
     """Resize the image down to or up to the specified size.
 
     Specify width or height for the image size if you want to preserve the aspect ration of the image.
@@ -26,6 +25,7 @@ def resize(image, width=None, height=None,
     :rtype: numpy.ndarray
     """
     src_h, src_w = image.shape[:2]
+    ratio = None
 
     if width is None and height is None:
         # No size specified - return original image
@@ -35,7 +35,8 @@ def resize(image, width=None, height=None,
         # Calculate the ratio of the height and construct the dimensions
         ratio = height / float(src_h)
         width = int(src_w * ratio)
-    else:
+
+    if height is None:
         # Calculate the ratio of the width and construct the dimensions
         ratio = width / float(src_w)
         height = int(src_h * ratio)
@@ -57,13 +58,13 @@ def resize(image, width=None, height=None,
     # Compute scaling and pad sizing
     if aspect > 1:  # Horizontal image
         new_w = width
-        new_h = np.round(new_w / aspect).astype(int)
+        new_h = np.round(new_w / aspect).astype(int) if ratio or pad else height
         pad_vert = (height - new_h) / 2
         pad_top, pad_bot = np.floor(pad_vert).astype(int), np.ceil(pad_vert).astype(int)
         pad_left, pad_right = 0, 0
     elif aspect < 1:  # Vertical image
         new_h = height
-        new_w = np.round(new_h * aspect).astype(int)
+        new_w = np.round(new_h * aspect).astype(int) if ratio or pad else width
         pad_horz = (width - new_w) / 2
         pad_left, pad_right = np.floor(pad_horz).astype(int), np.ceil(pad_horz).astype(int)
         pad_top, pad_bot = 0, 0
