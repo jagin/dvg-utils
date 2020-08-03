@@ -58,13 +58,13 @@ def resize(image, width=None, height=None, interp=None, pad=False, pad_color=0):
     # Compute scaling and pad sizing
     if aspect > 1:  # Horizontal image
         new_w = width
-        new_h = np.round(new_w / aspect).astype(int) if ratio or pad else height
+        new_h = np.round(new_w / aspect).astype(int) if not height or pad else height
         pad_vert = (height - new_h) / 2
         pad_top, pad_bot = np.floor(pad_vert).astype(int), np.ceil(pad_vert).astype(int)
         pad_left, pad_right = 0, 0
     elif aspect < 1:  # Vertical image
         new_h = height
-        new_w = np.round(new_h * aspect).astype(int) if ratio or pad else width
+        new_w = np.round(new_h * aspect).astype(int) if not width or pad else width
         pad_horz = (width - new_w) / 2
         pad_left, pad_right = np.floor(pad_horz).astype(int), np.ceil(pad_horz).astype(int)
         pad_top, pad_bot = 0, 0
