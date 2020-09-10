@@ -35,6 +35,8 @@ immediately available to other users of the package on our system:
 
 Running tests requires `pytest` package to be installed.
 
+    $ pip install pytest
+
     $ make test
     
 ## Command line utils

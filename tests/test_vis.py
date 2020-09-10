@@ -1,174 +1,194 @@
-from dvgutils.vis import resize, rectangle_overlay, put_text
 import cv2
 import os
+
+from dvgutils.vis import resize, rectangle_overlay, put_text
+from dvgutils import colors
+
+import tests.config as config
 
 
 class TestVis:
     def test_resize(self):
-        image_path = "assets/images/friends/friends_01.jpg"
+        output_path = os.path.join(config.OUTPUT_DIR, "tests")
+        os.makedirs(output_path, exist_ok=True)
 
-        output_path = "output/tests/"
-        dirname = os.path.abspath(output_path)
-        os.makedirs(dirname, exist_ok=True)
-
+        image_path = os.path.join(config.ASSETS_IMAGES_DIR, "friends", "friends_01.jpg")
         image = cv2.imread(image_path)
 
-        image_resized_w = resize(image, width=300)
-        cv2.imwrite(output_path + "image_resized_w.png", image_resized_w)
-        assert image_resized_w.shape[:2][1] == 300
+        image_test = resize(image, width=300)
+        cv2.imwrite(os.path.join(output_path, "test_resize_w_300.png"), image_test)
+        assert image_test.shape[:2][1] == 300
 
-        image_resized_h = resize(image, height=300)
-        cv2.imwrite(output_path + "image_resized_h.png", image_resized_h)
-        assert image_resized_h.shape[:2][0] == 300
+        image_test = resize(image, height=300)
+        cv2.imwrite(os.path.join(output_path, "test_resize_h_300.png"), image_test)
+        assert image_test.shape[:2][0] == 300
 
-        image_resized_h_w = resize(image, width=300, height=300)
-        cv2.imwrite(output_path + "image_resized_h_w.png", image_resized_h_w)
-        assert image_resized_h_w.shape[:2] == (300, 300)
+        image_test = resize(image, width=300, height=300)
+        cv2.imwrite(os.path.join(output_path, "test_resize_w_300_h_300.png"), image_test)
+        assert image_test.shape[:2] == (300, 300)
 
-        image_resized_h_w_p = resize(image, width=300, height=300, pad=True)
-        cv2.imwrite(output_path + "image_resized_h_w_p.png", image_resized_h_w_p)
-        assert image_resized_h_w_p.shape[:2] == (300, 300)
+    def test_resize_horizontal_with_padding(self):
+        output_path = os.path.join(config.OUTPUT_DIR, "tests")
+        os.makedirs(output_path, exist_ok=True)
+
+        # Horizontal image
+        image_path = os.path.join(config.ASSETS_IMAGES_DIR, "friends", "friends_01.jpg")
+        image = cv2.imread(image_path)
+
+        image_test = resize(image, width=300, height=600, pad=True)
+        cv2.imwrite(os.path.join(output_path, "test_resize_horizontal_with_padding_w_300_h_600.png"), image_test)
+        assert image_test.shape[:2] == (600, 300)
+
+        image_test = resize(image, width=600, height=300, pad=True)
+        cv2.imwrite(os.path.join(output_path, "test_resize_horizontal_with_padding_w_600_h_300.png"), image_test)
+        assert image_test.shape[:2] == (300, 600)
+
+    def test_resize_vertical_with_padding(self):
+        output_path = os.path.join(config.OUTPUT_DIR, "tests")
+        os.makedirs(output_path, exist_ok=True)
+
+        # Vertical image
+        image_path = os.path.join(config.ASSETS_IMAGES_DIR, "friends", "friends_05.jpg")
+        image = cv2.imread(image_path)
+
+        image_test = resize(image, width=300, height=600, pad=True)
+        cv2.imwrite(os.path.join(output_path, "test_resize_vertical_with_padding_w_300_h_600_pad.png"), image_test)
+        assert image_test.shape[:2] == (600, 300)
+
+        image_test = resize(image, width=600, height=300, pad=True)
+        cv2.imwrite(os.path.join(output_path, "test_resize_vertical_with_padding_w_600_h_300_pad.png"), image_test)
+        assert image_test.shape[:2] == (300, 600)
 
     def test_rectangle_overlay(self):
-        image_path = "assets/images/friends/friends_01.jpg"
+        output_path = os.path.join(config.OUTPUT_DIR, "tests")
+        os.makedirs(output_path, exist_ok=True)
 
-        output_path = "output/tests/"
-        dirname = os.path.abspath(output_path)
-        os.makedirs(dirname, exist_ok=True)
-
+        image_path = os.path.join(config.ASSETS_IMAGES_DIR, "friends", "friends_01.jpg")
         image = cv2.imread(image_path)
 
         image_overlay_red_a1 = image.copy()
-        rectangle_overlay(image_overlay_red_a1, (200, 200), (500, 500), (0, 0, 255), 1)
-        cv2.imwrite(output_path + "image_overlay_red_a1.png", image_overlay_red_a1)
-        assert image_overlay_red_a1[300:400, 300:400, 2].sum() > image[300:400, 300:400, 2].sum()
+        rectangle_overlay(image_overlay_red_a1, (200, 200), (500, 500), colors.get("red").bgr(), 0.5)
+        cv2.imwrite(os.path.join(output_path, "test_rectangle_overlay.png"), image_overlay_red_a1)
+        assert image_overlay_red_a1[200:500, 200:500, 2].sum() > image[200:500, 200:500, 2].sum()
 
     def test_put_text(self):
-        image_path = "assets/images/friends/friends_01.jpg"
+        output_path = os.path.join(config.OUTPUT_DIR, "tests")
+        os.makedirs(output_path, exist_ok=True)
 
-        output_path = "output/tests/"
-        dirname = os.path.abspath(output_path)
-        os.makedirs(dirname, exist_ok=True)
-
+        image_path = os.path.join(config.ASSETS_IMAGES_DIR, "friends", "friends_01.jpg")
         image = cv2.imread(image_path)
-        im_h, im_w = image.shape[:2]
+        test_text = "TEST TEXT"
+        text_org = (500, 500)
+        text_padding = 20
 
-        image_text_redt_tl = image.copy()
-        cv2.circle(image_text_redt_tl, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_tl, "TEST TEXT", (500, 500), color=(0, 0, 255), org_pos="tl", font_scale=3)
-        image_text_redt_tl = cv2.line(image_text_redt_tl, (500, 500), (500, im_h), (0, 255, 0), 1)
-        image_text_redt_tl = cv2.line(image_text_redt_tl, (500, 500), (im_w, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_tl.png", image_text_redt_tl)
-        assert image_text_redt_tl[501:600, 501:600, 2].sum() > image[501:600, 501:600, 2].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), org_pos="tl", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_tl.png"), image_test)
+        assert text_org == pt1
 
-        image_text_redt_tr = image.copy()
-        cv2.circle(image_text_redt_tr, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_tr, "TEST TEXT", (500, 500), color=(0, 0, 255), org_pos="tr", font_scale=3)
-        image_text_redt_tr = cv2.line(image_text_redt_tr, (500, 500), (500, im_h), (0, 255, 0), 1)
-        image_text_redt_tr = cv2.line(image_text_redt_tr, (500, 500), (0, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_tr.png", image_text_redt_tr)
-        assert image_text_redt_tr[501:600, 300:400, 2].sum() > image[501:600, 300:400, 2].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), org_pos="tr", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_tr.png"), image_test)
+        assert text_org == (pt2[0], pt1[1])
 
-        image_text_redt_bl = image.copy()
-        cv2.circle(image_text_redt_bl, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_bl, "TEST TEXT", (500, 500), color=(0, 0, 255), org_pos="bl", font_scale=3)
-        image_text_redt_bl = cv2.line(image_text_redt_bl, (500, 500), (500, 0), (0, 255, 0), 1)
-        image_text_redt_bl = cv2.line(image_text_redt_bl, (500, 500), (im_w, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_bl.png", image_text_redt_bl)
-        assert image_text_redt_bl[400:501, 501:600, 2].sum() > image[400:501, 501:600, 2].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), org_pos="bl", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_bl.png"), image_test)
+        assert text_org == (pt1[0], pt2[1])
 
-        image_text_redt_br = image.copy()
-        cv2.circle(image_text_redt_br, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_br, "TEST TEXT", (500, 500), color=(0, 0, 255), org_pos="br", font_scale=3)
-        image_text_redt_br = cv2.line(image_text_redt_br, (500, 500), (500, 0), (0, 255, 0), 1)
-        image_text_redt_br = cv2.line(image_text_redt_br, (500, 500), (0, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_br.png", image_text_redt_br)
-        assert image_text_redt_br[400:501, 400:501, 2].sum() > image[400:501, 400:501, 2].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), org_pos="br", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_br.png"), image_test)
+        assert text_org == (pt2[0], pt2[1])
 
-        image_text_redt_blueb_tl = image.copy()
-        cv2.circle(image_text_redt_blueb_tl, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_tl, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0), bg_alpha=1,
-                 org_pos="tl", font_scale=3)
-        image_text_redt_blueb_tl = cv2.line(image_text_redt_blueb_tl, (500, 500), (500, im_h), (0, 255, 0), 1)
-        image_text_redt_blueb_tl = cv2.line(image_text_redt_blueb_tl, (500, 500), (im_w, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_tl.png", image_text_redt_blueb_tl)
-        assert image_text_redt_blueb_tl[501:600, 501:600, 0].sum() > image[501:600, 501:600, 0].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="tl", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_tl.png"), image_test)
+        assert text_org == (pt1[0], pt1[1])
 
-        image_text_redt_blueb_tr = image.copy()
-        cv2.circle(image_text_redt_blueb_tr, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_tr, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0), bg_alpha=1,
-                 org_pos="tr", font_scale=3)
-        image_text_redt_blueb_tr = cv2.line(image_text_redt_blueb_tr, (500, 500), (500, im_h), (0, 255, 0), 1)
-        image_text_redt_blueb_tr = cv2.line(image_text_redt_blueb_tr, (500, 500), (0, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_tr.png", image_text_redt_blueb_tr)
-        assert image_text_redt_blueb_tr[501:600, 300:400, 0].sum() > image[501:600, 300:400, 0].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="tr", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_tr.png"), image_test)
+        assert text_org == (pt2[0], pt1[1])
 
-        image_text_redt_blueb_bl = image.copy()
-        cv2.circle(image_text_redt_blueb_bl, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_bl, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0), bg_alpha=1,
-                 org_pos="bl", font_scale=3)
-        image_text_redt_blueb_bl = cv2.line(image_text_redt_blueb_bl, (500, 500), (500, 0), (0, 255, 0), 1)
-        image_text_redt_blueb_bl = cv2.line(image_text_redt_blueb_bl, (500, 500), (im_w, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_bl.png", image_text_redt_blueb_bl)
-        assert image_text_redt_blueb_bl[400:501, 501:600, 0].sum() > image[400:501, 501:600, 0].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="bl", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_bl.png"), image_test)
+        assert text_org == (pt1[0], pt2[1])
 
-        image_text_redt_blueb_br = image.copy()
-        cv2.circle(image_text_redt_blueb_br, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_br, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0), bg_alpha=1,
-                 org_pos="br", font_scale=3)
-        image_text_redt_blueb_br = cv2.line(image_text_redt_blueb_br, (500, 500), (500, 0), (0, 255, 0), 1)
-        image_text_redt_blueb_br = cv2.line(image_text_redt_blueb_br, (500, 500), (0, 500), (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_br.png", image_text_redt_blueb_br)
-        assert image_text_redt_blueb_br[400:501, 400:501, 0].sum() > image[400:501, 400:501, 0].sum()
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="br", font_scale=3)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_br.png"), image_test)
+        assert text_org == (pt2[0], pt2[1])
 
-        image_text_redt_blueb_tl_pad = image.copy()
-        cv2.circle(image_text_redt_blueb_tl_pad, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_tl_pad, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0),
-                 bg_alpha=1,
-                 org_pos="tl", font_scale=3, padding=20)
-        image_text_redt_blueb_tl_pad = cv2.line(image_text_redt_blueb_tl_pad, (500, 500), (500, im_h), (0, 255, 0), 1)
-        image_text_redt_blueb_tl_pad = cv2.line(image_text_redt_blueb_tl_pad, (500, 500), (im_w, 500), (0, 255, 0), 1)
-        image_text_redt_blueb_tl_pad = cv2.line(image_text_redt_blueb_tl_pad, (500 + 20, 500 + 20), (500 + 20, im_h),
-                                                (0, 255, 0), 1)
-        image_text_redt_blueb_tl_pad = cv2.line(image_text_redt_blueb_tl_pad, (500 + 20, 500 + 20), (im_w, 500 + 20),
-                                                (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_tl_pad.png", image_text_redt_blueb_tl_pad)
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="tl", font_scale=3, padding=text_padding)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.rectangle(image_test, (pt1[0] + text_padding, pt1[1] + text_padding),
+                      (pt2[0] - text_padding, pt2[1] - text_padding), colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_tl_pad.png"), image_test)
+        assert text_org == (pt1[0], pt1[1])
 
-        image_text_redt_blueb_tr_pad = image.copy()
-        cv2.circle(image_text_redt_blueb_tr_pad, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_tr_pad, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0),
-                 bg_alpha=1,
-                 org_pos="tr", font_scale=3, padding=20)
-        image_text_redt_blueb_tr_pad = cv2.line(image_text_redt_blueb_tr_pad, (500, 500), (500, im_h), (0, 255, 0), 1)
-        image_text_redt_blueb_tr_pad = cv2.line(image_text_redt_blueb_tr_pad, (500, 500), (0, 500), (0, 255, 0), 1)
-        image_text_redt_blueb_tr_pad = cv2.line(image_text_redt_blueb_tr_pad, (500 - 20, 500 + 20), (500 - 20, im_h),
-                                                (0, 255, 0), 1)
-        image_text_redt_blueb_tr_pad = cv2.line(image_text_redt_blueb_tr_pad, (500 - 20, 500 + 20), (0, 500 + 20),
-                                                (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_tr_pad.png", image_text_redt_blueb_tr_pad)
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="tr", font_scale=3, padding=text_padding)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.rectangle(image_test, (pt1[0] + text_padding, pt1[1] + text_padding),
+                      (pt2[0] - text_padding, pt2[1] - text_padding), colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_tr_pad.png"), image_test)
+        assert text_org == (pt2[0], pt1[1])
 
-        image_text_redt_blueb_bl_pad = image.copy()
-        cv2.circle(image_text_redt_blueb_bl_pad, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_bl_pad, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0),
-                 bg_alpha=1,
-                 org_pos="bl", font_scale=3, padding=20)
-        image_text_redt_blueb_bl_pad = cv2.line(image_text_redt_blueb_bl_pad, (500, 500), (500, 0), (0, 255, 0), 1)
-        image_text_redt_blueb_bl_pad = cv2.line(image_text_redt_blueb_bl_pad, (500, 500), (im_w, 500), (0, 255, 0), 1)
-        image_text_redt_blueb_bl_pad = cv2.line(image_text_redt_blueb_bl_pad, (500 + 20, 500 - 20), (500 + 20, 0),
-                                                (0, 255, 0), 1)
-        image_text_redt_blueb_bl_pad = cv2.line(image_text_redt_blueb_bl_pad, (500 + 20, 500 - 20), (im_w, 500 - 20),
-                                                (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_bl_pad.png", image_text_redt_blueb_bl_pad)
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="bl", font_scale=3, padding=text_padding)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.rectangle(image_test, (pt1[0] + text_padding, pt1[1] + text_padding),
+                      (pt2[0] - text_padding, pt2[1] - text_padding), colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_bl_pad.png"), image_test)
+        assert text_org == (pt1[0], pt2[1])
 
-        image_text_redt_blueb_br_pad = image.copy()
-        cv2.circle(image_text_redt_blueb_br_pad, (500, 500), 2, (0, 255, 0))
-        put_text(image_text_redt_blueb_br_pad, "TEST TEXT", (500, 500), color=(0, 0, 255), bg_color=(255, 0, 0),
-                 bg_alpha=1,
-                 org_pos="br", font_scale=3, padding=20)
-        image_text_redt_blueb_br_pad = cv2.line(image_text_redt_blueb_br_pad, (500, 500), (500, 0), (0, 255, 0), 1)
-        image_text_redt_blueb_br_pad = cv2.line(image_text_redt_blueb_br_pad, (500, 500), (0, 500), (0, 255, 0), 1)
-        image_text_redt_blueb_br_pad = cv2.line(image_text_redt_blueb_br_pad, (500 - 20, 500 - 20), (500 - 20, 0),
-                                                (0, 255, 0), 1)
-        image_text_redt_blueb_br_pad = cv2.line(image_text_redt_blueb_br_pad, (500 - 20, 500 - 20), (0, 500 - 20),
-                                                (0, 255, 0), 1)
-        cv2.imwrite(output_path + "image_text_redt_blueb_br_pad.png", image_text_redt_blueb_br_pad)
+        image_test = image.copy()
+        cv2.circle(image_test, text_org, 4, colors.get("red").bgr())
+        pt1, pt2 = put_text(image_test, test_text, text_org,
+                            color=colors.get("red").bgr(), bg_color=colors.get("blue").bgr(), bg_alpha=0.6,
+                            org_pos="br", font_scale=3, padding=text_padding)
+        cv2.rectangle(image_test, pt1, pt2, colors.get("green").bgr(), 1)
+        cv2.rectangle(image_test, (pt1[0] + text_padding, pt1[1] + text_padding),
+                      (pt2[0] - text_padding, pt2[1] - text_padding), colors.get("green").bgr(), 1)
+        cv2.imwrite(os.path.join(output_path, "test_put_text_red_blue_br_pad.png"), image_test)
+        assert text_org == (pt2[0], pt2[1])
