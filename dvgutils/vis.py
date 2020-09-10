@@ -6,8 +6,7 @@ import numpy as np
 from .misc import clip_points
 
 
-def resize(image, width=None, height=None,
-           interp=None, pad=False, pad_color=0):
+def resize(image, width=None, height=None, interp=None, pad=False, pad_color=0):
     """Resize the image down to or up to the specified size.
 
     Specify width or height for the image size if you want to preserve the aspect ration of the image.
@@ -35,7 +34,8 @@ def resize(image, width=None, height=None,
         # Calculate the ratio of the height and construct the dimensions
         ratio = height / float(src_h)
         width = int(src_w * ratio)
-    else:
+
+    if height is None:
         # Calculate the ratio of the width and construct the dimensions
         ratio = width / float(src_w)
         height = int(src_h * ratio)
@@ -51,32 +51,37 @@ def resize(image, width=None, height=None,
         else:  # Stretching image
             interp = cv2.INTER_CUBIC
 
-    # Aspect ratio of image
-    aspect = src_w / src_h
+    src_aspect = src_w / src_h  # Aspect ratio of the source image
+    aspect = width / height  # Aspect ratio of the new image
 
-    # Compute scaling and pad sizing
-    if aspect > 1:  # Horizontal image
+    # Compute scaling
+    if src_aspect > 1 and aspect < 1 or src_aspect < 1 and aspect < 1:
         new_w = width
-        new_h = np.round(new_w / aspect).astype(int)
-        pad_vert = (height - new_h) / 2
-        pad_top, pad_bot = np.floor(pad_vert).astype(int), np.ceil(pad_vert).astype(int)
-        pad_left, pad_right = 0, 0
-    elif aspect < 1:  # Vertical image
+        new_h = np.round(new_w / src_aspect).astype(int) if pad else height
+    elif src_aspect > 1 and aspect > 1 or src_aspect < 1 and aspect > 1:
         new_h = height
-        new_w = np.round(new_h * aspect).astype(int)
-        pad_horz = (width - new_w) / 2
-        pad_left, pad_right = np.floor(pad_horz).astype(int), np.ceil(pad_horz).astype(int)
-        pad_top, pad_bot = 0, 0
+        new_w = np.round(new_h * src_aspect).astype(int) if pad else width
     else:  # Square image
         new_h, new_w = height, width
-        pad_left, pad_right, pad_top, pad_bot = 0, 0, 0, 0
 
+    # Resize image
     image = cv2.resize(image, (new_w, new_h), interpolation=interp)
 
     if pad:
         if len(image.shape) is 3 and not isinstance(pad_color, (list, tuple, np.ndarray)):
             # Color image - set pad color as RGB
             pad_color = [pad_color] * 3
+
+        if aspect > 1:
+            pad_horz = (width - new_w) / 2
+            pad_left, pad_right = np.floor(pad_horz).astype(int), np.ceil(pad_horz).astype(int)
+            pad_top, pad_bot = 0, 0
+        elif aspect < 1:
+            pad_vert = (height - new_h) / 2
+            pad_top, pad_bot = np.floor(pad_vert).astype(int), np.ceil(pad_vert).astype(int)
+            pad_left, pad_right = 0, 0
+        else:
+            pad_left, pad_right, pad_top, pad_bot = 0, 0, 0, 0
 
         # Pad the image with borders
         image = cv2.copyMakeBorder(image, pad_top, pad_bot, pad_left, pad_right,
@@ -156,3 +161,5 @@ def put_text(image, text, org, font_face=cv2.FONT_HERSHEY_SIMPLEX, font_scale=0.
                 color=color,
                 thickness=thickness,
                 lineType=line_type)
+
+    return bg_rect_pt1, bg_rect_pt2
