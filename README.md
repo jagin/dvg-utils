@@ -1,7 +1,12 @@
 # dvgutils
 > Go Deep with your Vision
 
-A set of tools to help you easily build your image and video processing pipeline using OpenCV and Python3.
+**dvgutils** is a set of tools to help you easily build your image and video processing pipeline using OpenCV and Python3.
+With an easy configuration file and implementation modules you can try your computer vision pipeline 
+on different devices like webcams, RaspberryPi Camera or camera connected to 
+NVIDIA Jetson device (Nano, TX2, XAVIER) through GStreamer and more.
+
+The library provides a handful of examples to start from.
 
 ## Getting Started
 
@@ -41,35 +46,72 @@ Running tests requires `pytest` package to be installed.
     
 ## Command line utils
 
-Convert a video file to set of images:
+After `dvg-utils` installation you get access to `dvg-utils` command which allows you to:
 
-    $ dvg-utils v2i -i assets/videos/faces.mp4 -o output --display
+- convert a video file to set of images:
+
+      $ dvg-utils v2i -i assets/videos/faces.mp4 -o output --display
     
-Convert set of frame images to a video file:
+- convert set of frame images to a video file:
 
-    $ dvg-utils i2v -i output -o output/my_new_file.avi --display
+      $ dvg-utils i2v -i output -o output/my_new_file.avi --display
+      
+- plot metrics (see examples below):
+
+      $ dvg-utils pm --input output/metrics_1.csv --input output/metrics_2.csv
  
 ## Examples
 
+### Preparation
+
+    $ pip install matplotlib
+    $ pip install scipy
+
+If you run examples on Raspberry Pi Camera you will need to:
+
+    $ pip install picamera
+
+### Capture single image
+
     $ python ./examples/capture_image.py -i assets/images/friends
-    
+
+### Capture video stream 
+
     $ python ./examples/capture_video.py
     
+### Capture two video stream from web cameras
+
     $ python ./examples/capture_multi_video.py
+    
+### Detect faces in images
 
     $ python ./examples/detect_face_image.py -i assets/images/friends
+
+### Detect faces in a video stream:
     
     $ python ./examples/detect_face_video.py --metrics output/metrics_no_pipeline.csv
+
+or using pipeline implementation:
     
     $ python ./examples/detect_face_video.py --pipeline --metrics output/metrics_with_pipeline.csv
+
+### Compare the collected metrics
     
     $ dvg-utils pm --input output/metrics_no_pipeline.csv --input output/metrics_with_pipeline.csv 
     
+### Detect motion in a video stream
+    
     $ python ./examples/detect_motion_video.py
+
+### Detect object in a video stream
 
     $ python ./examples/detect_object_video.py
 
+### Track object in a video stream
+
     $ python ./examples/track_object_video.py
+    
+### Count object in a video stream
 
     $ python ./examples/count_object_video.py
 

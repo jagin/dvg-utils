@@ -3,4 +3,3 @@ tqdm
 pyyaml
 numpy
 opencv-contrib-python
-matplotlib

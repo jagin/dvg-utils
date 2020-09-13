@@ -1,8 +1,9 @@
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def plot_metrics(args):
+    from matplotlib import pyplot as plt
+
     # Plot metrics
     fig, ax = plt.subplots(dpi=128, figsize=(10, 6))
     color_idx = np.linspace(0, 1, len(args["input"]))

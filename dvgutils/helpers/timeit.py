@@ -22,7 +22,7 @@ def timeit(func):
         end_time = time.perf_counter()
         elapsed_time = (end_time - start_time) * 1000.0
 
-        logging.getLogger(f"{func.__module__}.{func.__name__}").debug(f"Execution time: {elapsed_time:0.4f} ms")
+        logging.getLogger(f"{func.__module__}.{func.__name__}").debug(f"{func.__module__}.{func.__name__} execution time: {elapsed_time:0.4f} ms")
 
         return result
 
