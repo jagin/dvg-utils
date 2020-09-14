@@ -16,6 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-cf", "--conf", default="config/detect_face_image.yml",
                         help="Path to the input configuration file (default: config/detect_face_image.yml)")
+    parser.add_argument("-cfo", "--conf-overwrites", nargs="+", type=str)
     parser.add_argument("-i", "--input", required=True, type=str,
                         help="image file or images input path")
     parser.add_argument("-ie", "--image-ext", default="jpg", choices=["jpg", "png"],
@@ -36,7 +37,7 @@ def parse_args():
 
 def detect_face(args):
     logger = logging.getLogger(__name__)
-    conf = load_config(args["conf"])
+    conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup processing modules
     image_capture = ImageCapture(args["input"], "." + args["image_ext"], args["contains"])
@@ -127,7 +128,7 @@ class VisualizeDataPipe:
 
 def detect_face_pipeline(args):
     logger = logging.getLogger(__name__)
-    conf = load_config(args["conf"])
+    conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup pipeline steps
     capture_image_pipe = CaptureImagePipe(args["input"], "." + args["image_ext"], args["contains"])

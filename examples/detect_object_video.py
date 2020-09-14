@@ -13,6 +13,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-cf", "--conf", default="config/detect_object_video.yml",
                         help="Path to the input configuration file (default: config/detect_object_video.yml)")
+    parser.add_argument("-cfo", "--conf-overwrites", nargs="+", type=str)
     parser.add_argument("-o", "--output", type=str,
                         help="output video file name")
     parser.add_argument("--no-display", dest='display', action="store_false",
@@ -59,7 +60,7 @@ class VisualizeDataPipe:
 
 def detect_object(args):
     logger = logging.getLogger(__name__)
-    conf = load_config(args["conf"])
+    conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup pipeline steps
     capture_video_pipe = CaptureVideoPipe(conf["videoCapture"])

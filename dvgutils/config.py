@@ -3,8 +3,9 @@ import re
 import yaml
 import logging
 
+
 # Credits: https://medium.com/swlh/python-yaml-configuration-with-environment-variables-parsing-77930f4273ac
-def load_config(config_file, tag='!ENV'):
+def load_config(config_file, overwrites=None, tag='!ENV'):
     """Load a yaml configuration file and resolve any environment variables.
 
     The environment variables must have !ENV before them and be in this format
@@ -19,6 +20,7 @@ def load_config(config_file, tag='!ENV'):
         something_else: !ENV '${AWESOME_ENV_VAR}/var/${A_SECOND_AWESOME_VAR}'
 
     :param str config_file: the path to the yaml config file
+    :param str overwrites: list of property values to overwrite
     :param str tag: the tag to look for
     :returns: the dict configuration
     :rtype: dict[str, T]
@@ -59,4 +61,24 @@ def load_config(config_file, tag='!ENV'):
     with open(config_file) as conf_data:
         config = yaml.load(conf_data, Loader=loader)
 
+    if overwrites:
+        overwrite_config(config, overwrites)
+
     return config
+
+
+def overwrite_config(config, overwrites):
+    for overwrite in overwrites:
+        props, value = overwrite.split("=")
+        props = props.split(".")
+        value = yaml.safe_load(value)
+        overwrite = props + [value]
+        cur = config
+        for path_item in overwrite[:-2]:
+            try:
+                cur = cur[path_item]
+            except KeyError:
+                cur[path_item] = {}
+                cur = cur[path_item]
+
+        cur[overwrite[-2]] = overwrite[-1]
