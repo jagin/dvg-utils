@@ -10,16 +10,28 @@ The library provides a handful of examples to start from.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your local machine for development and testing 
+purposes.
 
 ### Prerequisites
 
-I suggest to use Python virtual environment. Virtual environments will allow you to run independent Python environments in isolation on your system.
+I suggest to use Python virtual environment. Virtual environments will allow you to run independent Python environments 
+in isolation on your system.  
 Please take a look at [this article on RealPython](https://realpython.com/python-virtual-environments-a-primer/).
 
-Install [requirements.txt](requirements.txt) in your Python environment.
+    $ pip install tqdm pyyaml numpy
 
-    $ pip install -r requirements.txt
+Istall OpenCV with:
+
+    $ pip install opencv-contrib
+    
+or
+
+    $ pip install opencv-contrib-python
+    
+if you need both main and contrib modules.
+    
+Note: Skip this on Jetson devices with JetPack SDK as it is already installed.
 
 ### Installation
 
@@ -66,6 +78,7 @@ After `dvg-utils` installation you get access to `dvg-utils` command which allow
 
     $ pip install matplotlib
     $ pip install scipy
+    $ pip install dlib
 
 If you run examples on Raspberry Pi Camera you will need to:
 
