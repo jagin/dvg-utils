@@ -1,0 +1,17 @@
+imageCapture:
+  # Path can be a folder with images
+  path: assets/images/friends
+  # with the following extension
+  valid_ext: jpg
+  # We can filter the names of the images containing selected word
+  #contains: some_string
+
+  # Path can also select single file
+  #path: assets/image/friends/friends_01.jpg
+
+
+  # Transform image
+  transform:
+    resize:
+      width: 320
+    flip: 1  # 0 - vertical, 1 - horizontal, -1 - vertical and horizontal

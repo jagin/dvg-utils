@@ -38,6 +38,13 @@ def list_files(path, valid_exts=None, contains=None, level=None):
     :returns: yields file path
     :rtype: str
     """
+
+    # Add a dot to selected file extension(s)
+    if isinstance(valid_exts, list):
+        valid_exts = (f".{ext}" for ext in valid_exts)
+    else:
+        valid_exts = (f".{valid_exts}",)
+
     # Loop over the input directory structure
     for (root_dir, dir_names, filenames) in walk_to_level(path, level):
         for filename in sorted(filenames):

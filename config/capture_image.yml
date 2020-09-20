@@ -1,0 +1,10 @@
+imageCapture:
+  path: assets/images/friends
+  valid_ext: jpg
+  #contains: some_string
+
+  # Transform image
+  transform:
+    resize:
+      width: 320
+    flip: 1  # 0 - vertical, 1 - horizontal, -1 - vertical and horizontal
