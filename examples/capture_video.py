@@ -32,8 +32,9 @@ def parse_args():
 
 
 def capture_video(args):
-    print(args["conf_overwrites"])
+    # Setup logger
     logger = logging.getLogger(__name__)
+    # Read configuration
     conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup processing modules
@@ -118,7 +119,9 @@ class VisualizeDataPipe:
 
 
 def capture_video_pipeline(args):
+    # Setup logger
     logger = logging.getLogger(__name__)
+    # Read configuration
     conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup pipeline steps

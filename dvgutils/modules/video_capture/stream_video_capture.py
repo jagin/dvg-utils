@@ -59,7 +59,6 @@ class StreamVideoCapture:
 
 
 class StreamVideoCaptureThreaded(StreamVideoCapture):
-
     def __init__(self, src, api_preference=cv2.CAP_ANY, transform=None,
                  queue_size=5, name="StreamVideoCaptureThreaded"):
         super().__init__(src, api_preference, transform)

@@ -1,10 +1,10 @@
-# dvgutils
+# dvg-utils
 > Go Deep with your Vision
 
-**dvgutils** is a set of tools to help you easily build your image and video processing pipeline using OpenCV and Python3.
+**dvg-utils** is a set of tools to help you easily build your image and video processing pipeline using OpenCV and Python.
 With an easy configuration file and implementation modules you can try your computer vision pipeline 
-on different devices like webcams, RaspberryPi Camera or camera connected to 
-NVIDIA Jetson device (Nano, TX2, XAVIER) through GStreamer and more.
+on different devices like webcams, RaspberryPi Camera or camera connected to NVIDIA Jetson device (Nano, TX2, XAVIER)
+through GStreamer and more.
 
 The library provides a handful of examples to start from.
 
@@ -15,23 +15,32 @@ purposes.
 
 ### Prerequisites
 
-I suggest to use Python virtual environment. Virtual environments will allow you to run independent Python environments 
+I suggest using Python virtual environment. Virtual environments will allow you to run independent Python environments 
 in isolation on your system.  
 Please take a look at [this article on RealPython](https://realpython.com/python-virtual-environments-a-primer/).
 
     $ pip install tqdm pyyaml numpy
 
-Istall OpenCV with:
+For OpenCV installation steps please look at [OpenCV Tutorials, Resources, and Guides](https://www.pyimagesearch.com/opencv-tutorials-resources-guides/).
 
-    $ pip install opencv-contrib
+Mostly:
+
+    $ pip install opencv-python
     
 or
 
     $ pip install opencv-contrib-python
     
-if you need both main and contrib modules.
+if you need both main and contrib modules should work.
+
+You can also try to play hard and [compile OpenCV with CUDA](https://www.pyimagesearch.com/2020/02/03/how-to-use-opencvs-dnn-module-with-nvidia-gpus-cuda-and-cudnn/) (if you got GPU on your board).
     
-Note: Skip this on Jetson devices with JetPack SDK as it is already installed.
+**NVIDIA Jetson** devices with *JetPack SDK* have OpenCV already installed.  
+For more info about OpenCV on Jetson platform looky [here](https://www.jetsonhacks.com/2019/11/15/5-things-about-opencv-on-jetson/).
+
+For **Raspberry Pi Buster**, install OpenCV with the help of this article: 
+[Install OpenCV 4 on Raspberry Pi 4 and Raspbian Buster](https://www.pyimagesearch.com/2019/09/16/install-opencv-4-on-raspberry-pi-4-and-raspbian-buster/)
+from the wonderful [PyImageSearch](https://www.pyimagesearch.com) blog.
 
 ### Installation
 
@@ -56,15 +65,15 @@ Running tests requires `pytest` package to be installed.
 
     $ make test
     
-## Command line utils
+## Command-line tool
 
-After `dvg-utils` installation you get access to `dvg-utils` command which allows you to:
+After `dvg-utils` installation, you get access to `dvg-utils` command which allows you to:
 
 - convert a video file to set of images:
 
       $ dvg-utils v2i -i assets/videos/faces.mp4 -o output --display
     
-- convert set of frame images to a video file:
+- convert a set of frame images to a video file:
 
       $ dvg-utils i2v -i output -o output/my_new_file.avi --display
       

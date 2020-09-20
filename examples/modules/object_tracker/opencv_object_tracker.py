@@ -4,8 +4,7 @@ from .centroid_tracker import CentroidTracker
 
 
 class OpencvObjectTracker:
-
-    def __init__(self, max_disappeared=40, max_distance=80, tracker_type="kcf"):
+    def __init__(self, max_disappeared=20, max_distance=80, tracker_type="kcf"):
         # Initialize the frame dimensions (we'll set them as soon as we read the first frame from the video)
         self.w = None
         self.h = None
@@ -22,7 +21,7 @@ class OpencvObjectTracker:
             "mosse": cv2.TrackerMOSSE_create
         }
 
-        # Instantiate our centroid tracker, then initialize a list to store each of our dlib correlation trackers,
+        # Instantiate our centroid tracker, then initialize a list to store each of our OpenCV correlation trackers,
         # followed by a dictionary to map each unique object ID to a TrackableObject
         self.centroid_tracker = CentroidTracker(max_disappeared, max_distance)
         self.trackers = []
@@ -34,17 +33,18 @@ class OpencvObjectTracker:
         if self.w is None or self.h is None:
             (self.h, self.w) = frame.shape[:2]
 
-        # Initialize  our list of bounding box rectangles returned by either (1) our object detector or
+        # Initialize  our list of bounding box rectangles returned by either
+        # (1) our object detector or
         # (2) the correlation trackers
         rects = []
 
-        # Check to see if we should run a more computationally expensive object detection method to aid our tracker
+        # Check to see if there are detected object locations from object detector to aid our tracker
         if object_locations:
             # Initialize our new set of object trackers
             self.trackers = []
             # Loop over the detections
             for detection in object_locations:
-                (start_x, start_y, end_x, end_y, class_name, confidence) = detection
+                (start_x, start_y, end_x, end_y) = detection[0:4]
 
                 # Grab the appropriate object tracker using our dictionary of OpenCV object tracker objects
                 tracker = self.OPENCV_OBJECT_TRACKERS[self.tracker_type]()
@@ -71,7 +71,8 @@ class OpencvObjectTracker:
                     # Add the bounding box coordinates to the rectangles list
                     rects.append((start_x, start_y, end_x, end_y))
 
-        # Use the centroid tracker to associate the (1) old object centroids with
+        # Use the centroid tracker to associate the
+        # (1) old object centroids with
         # (2) the newly computed object centroids
         objects, bbox_dims = self.centroid_tracker.update(rects)
         current_objects = []

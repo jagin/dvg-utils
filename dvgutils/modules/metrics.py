@@ -5,7 +5,6 @@ import numpy as np
 
 
 class Metrics:
-
     def __init__(self):
         self._start_time = None
         self._end_time = None

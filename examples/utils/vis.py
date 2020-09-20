@@ -28,8 +28,8 @@ def visualize_face_locations(vis_image, face_locations):
 
 def visualize_motion_locations(vis_image, motion_locations):
     if motion_locations:
-        for location in motion_locations:
-            (x1, y1, x2, y2) = location
+        for motion_location in motion_locations:
+            (x1, y1, x2, y2) = motion_location
             rectangle_overlay(vis_image, (x1, y1), (x2, y2), colors.get("red").bgr(), 0.5)
         put_text(vis_image, "MOTION DETECTED!", (0, 0), org_pos="tl",
                  bg_color=colors.get("red").bgr())
@@ -37,8 +37,8 @@ def visualize_motion_locations(vis_image, motion_locations):
 
 def visualize_object_locations(vis_image, object_locations):
     if object_locations:
-        for object_locations in object_locations:
-            (start_x, start_y, end_x, end_y, label, confidence) = object_locations
+        for object_location in object_locations:
+            (start_x, start_y, end_x, end_y, label, confidence) = object_location
             cv2.rectangle(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 2)
             rectangle_overlay(vis_image, (start_x, start_y), (end_x, end_y), colors.get("green").bgr(), 0.5)
             put_text(vis_image, f"{label} {confidence:.2f}", (start_x - 1, start_y - 1), org_pos="bl",

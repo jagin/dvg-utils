@@ -49,3 +49,6 @@ videoCapture:
       width: 320
     # 1 - for removing mirror effect
     flip: 1  # 0 - vertical, 1 - horizontal, -1 - vertical and horizontal
+
+  #Uncomment to switch off capturing video in separate thread
+  #threaded: false

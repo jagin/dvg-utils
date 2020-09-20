@@ -12,7 +12,7 @@ class CountObjectPipe:
     def detect(self, data):
         tracked_objects = data["tracked_objects"]
 
-        # Detect faces
+        # Count objects
         data["crossed_in_out"], data["line"] = self.counter.count(tracked_objects)
 
         return data

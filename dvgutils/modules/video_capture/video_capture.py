@@ -8,13 +8,12 @@ from ..transform import Transform
 
 
 class VideoCapture:
-
     def __init__(self, conf, threaded=True):
         self.conf = conf
         self.threaded = threaded if "threaded" not in conf else conf["threaded"]
         self.capture = conf["capture"]
 
-        # Setup optional video transformation function (resizing, flipping, etc.)
+        # Setup optional video frame transformation function (resizing, flipping, etc.)
         transform = Transform(conf["transform"]) if "transform" in conf else None
 
         if conf["capture"] == "file":

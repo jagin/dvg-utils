@@ -14,7 +14,7 @@ def plot_metrics(args):
         iterations = np.arange(1, len(metrics) + 1)
         if args["chart"] == "iter":
             metrics = metrics[:, 0] * 1000
-            title = "Iteration time"
+            title = "Iteration execution time"
             ylabel = "[ms]"
         elif args["chart"] == "ips":
             metrics = metrics[:, 1]
@@ -22,7 +22,7 @@ def plot_metrics(args):
             ylabel = "[it/s]"
         elif args["chart"] == "spi":
             metrics = metrics[:, 2] * 1000
-            title = "Averaged seconds per iteration"
+            title = "Averaged milliseconds per iteration"
             ylabel = "[ms/it]"
         mean = [np.mean(metrics)] * len(metrics)
         ax.plot(iterations, metrics, label=f"{metrics_file} data", color=plt.cm.cool(i))

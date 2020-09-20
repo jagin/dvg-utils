@@ -136,8 +136,8 @@ def detect_face_pipeline(args):
 
     # Setup pipeline steps
     capture_video_pipe = CaptureVideoPipe(conf["videoCapture"])
-    visualize_data_pipe = VisualizeDataPipe("vis_image")
     detect_face_pipe = DetectFacePipe(conf["faceDetector"])
+    visualize_data_pipe = VisualizeDataPipe("vis_image")
     video_fps = args["fps"] if args["fps"] is not None else capture_video_pipe.video_capture.fps
     save_video_pipe = SaveVideoPipe("vis_image", args["output"], fps=video_fps) if args["output"] else None
     show_image_pipe = ShowImagePipe("vis_image", "Video") if args["display"] else None

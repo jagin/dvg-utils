@@ -2,7 +2,6 @@ import cv2
 
 
 class ShowImage:
-
     def __init__(self, window_name, org=None, exit_key=27, delay=1, flags=cv2.WINDOW_AUTOSIZE):
         self.window_name = window_name
         self.exit_key = exit_key
@@ -23,7 +22,7 @@ class ShowImage:
 
     def show(self, image):
         # We are checking both window properties if the window is closed as they
-        # behave differently on different platforms (for ex. Ubuntu vs RaspberryPi)
+        # behave differently on different platforms (for ex. Ubuntu vs Raspberry Pi)
         wnd_prop_visible = cv2.getWindowProperty(self.window_name, cv2.WND_PROP_VISIBLE)
         wnd_prop_autosize = cv2.getWindowProperty(self.window_name, cv2.WND_PROP_AUTOSIZE)
 
@@ -44,7 +43,7 @@ class ShowImage:
                 key = cv2.waitKey(self.delay)
                 show = key != self.exit_key
             else:
-                # cv2.waitKey() creates a new thread.  If you press the “x” in GUI the main thread
+                # cv2.waitKey() creates a new thread.  If you press the “x” (closing icon) in GUI the main thread
                 # will be waiting for the cv2.waitKey() to be executed. Since the window is closed,
                 # the cv2.waitKey() has no chance to be executed - no window, no key press, deadlock.
                 # Here's the trick:

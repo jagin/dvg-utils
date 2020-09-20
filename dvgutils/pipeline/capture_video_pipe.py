@@ -5,7 +5,6 @@ from .observable import observable
 
 
 class CaptureVideoPipe:
-
     def __init__(self, conf, **kwargs):
         super().__init__()
 
