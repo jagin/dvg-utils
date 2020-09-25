@@ -2,7 +2,6 @@ from ..modules import Progress
 
 
 class ProgressPipe:
-
     def __init__(self, **kwargs):
         self.progress = Progress(**kwargs)
 

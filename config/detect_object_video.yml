@@ -2,7 +2,7 @@ videoCapture:
   capture: file
 
   file:
-    src: assets/videos/cars_driving.mp4
+    src: assets/videos/people_walking.mp4
 
   camera:
     src: 0
@@ -36,4 +36,4 @@ objectDetector:
     prototxt: models/MobileNetSSD_deploy.prototxt
     model: models/MobileNetSSD_deploy.caffemodel
     confidence: 0.5
-    classes: ["car"]
+    classes: ["person"]

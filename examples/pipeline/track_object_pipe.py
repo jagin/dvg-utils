@@ -13,7 +13,7 @@ class TrackObjectPipe:
         image = data["image"]
         object_locations = data["object_locations"]
 
-        # Detect faces
+        # Track objects
         data["tracked_objects"] = self.tracker.track(image, object_locations)
 
         return data

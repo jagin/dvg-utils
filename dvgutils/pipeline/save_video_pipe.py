@@ -2,7 +2,6 @@ from ..modules.save_video import SaveVideo
 
 
 class SaveVideoPipe:
-
     def __init__(self, image_key, *args, **kwargs):
         self.image_key = image_key
         self.save_video = SaveVideo(*args, **kwargs)

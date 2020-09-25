@@ -5,7 +5,6 @@ from .observable import observable
 
 
 class CaptureImagePipe:
-
     def __init__(self, *args, **kwargs):
         self.image_capture = ImageCapture(*args, **kwargs)
         self.stop = False

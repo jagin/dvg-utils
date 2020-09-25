@@ -3,7 +3,6 @@ from .observable import observable
 
 
 class ShowImagePipe:
-
     def __init__(self, image_key, *args, **kwargs):
         self.image_key = image_key
         self.show_image = ShowImage(*args, **kwargs)

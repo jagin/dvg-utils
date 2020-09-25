@@ -5,7 +5,6 @@ from queue import Queue
 
 
 class PiCameraVideoCapture:
-
     def __init__(self, src=0, resolution=(320, 240), fps=32, transform=None, **kwargs):
         self.logger = logging.getLogger(__name__)
 
@@ -68,7 +67,6 @@ class PiCameraVideoCapture:
 
 
 class PiCameraVideoCaptureThreaded(PiCameraVideoCapture):
-
     def __init__(self, src=0, resolution=(320, 240), fps=32, transform=None,
                  queue_size=5, name="PiCameraVideoCaptureThreaded", **kwargs):
         super().__init__(src, resolution, fps, transform, **kwargs)

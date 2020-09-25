@@ -14,6 +14,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-cf", "--conf", default="config/track_object_video.yml",
                         help="Path to the input configuration file (default: config/count_object_video.yml)")
+    parser.add_argument("-cfo", "--conf-overwrites", nargs="+", type=str)
     parser.add_argument("-o", "--output", type=str,
                         help="output video file name")
     parser.add_argument("--no-display", dest='display', action="store_false",
@@ -60,13 +61,13 @@ class VisualizeDataPipe:
 
 def track_object(args):
     logger = logging.getLogger(__name__)
-    conf = load_config(args["conf"])
+    conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup pipeline steps
     capture_video_pipe = CaptureVideoPipe(conf["videoCapture"])
-    visualize_data_pipe = VisualizeDataPipe("vis_image")
     object_detector_pipe = DetectObjectPipe(conf["objectDetector"])
     track_object_pipe = TrackObjectPipe(conf["objectTracker"])
+    visualize_data_pipe = VisualizeDataPipe("vis_image")
     video_fps = args["fps"] if args["fps"] is not None else capture_video_pipe.video_capture.fps
     save_video_pipe = SaveVideoPipe("vis_image", args["output"], fps=video_fps) if args["output"] else None
     show_image_pipe = ShowImagePipe("vis_image", "Video") if args["display"] else None

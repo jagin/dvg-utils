@@ -1,8 +1,9 @@
 import numpy as np
-from matplotlib import pyplot as plt
 
 
 def plot_metrics(args):
+    from matplotlib import pyplot as plt
+
     # Plot metrics
     fig, ax = plt.subplots(dpi=128, figsize=(10, 6))
     color_idx = np.linspace(0, 1, len(args["input"]))
@@ -13,7 +14,7 @@ def plot_metrics(args):
         iterations = np.arange(1, len(metrics) + 1)
         if args["chart"] == "iter":
             metrics = metrics[:, 0] * 1000
-            title = "Iteration time"
+            title = "Iteration execution time"
             ylabel = "[ms]"
         elif args["chart"] == "ips":
             metrics = metrics[:, 1]
@@ -21,7 +22,7 @@ def plot_metrics(args):
             ylabel = "[it/s]"
         elif args["chart"] == "spi":
             metrics = metrics[:, 2] * 1000
-            title = "Averaged seconds per iteration"
+            title = "Averaged milliseconds per iteration"
             ylabel = "[ms/it]"
         mean = [np.mean(metrics)] * len(metrics)
         ax.plot(iterations, metrics, label=f"{metrics_file} data", color=plt.cm.cool(i))

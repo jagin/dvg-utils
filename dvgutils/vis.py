@@ -9,7 +9,7 @@ from .misc import clip_points
 def resize(image, width=None, height=None, interp=None, pad=False, pad_color=0):
     """Resize the image down to or up to the specified size.
 
-    Specify width or height for the image size if you want to preserve the aspect ration of the image.
+    Specify width or height for the image size if you want to preserve the aspect ratio of the image.
     You can pad your image with additional border to preserve the aspect ration if needed for custom
     width and height.
 

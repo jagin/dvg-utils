@@ -5,7 +5,6 @@ from tqdm.contrib import DummyTqdmFile
 
 
 class Progress:
-
     def __init__(self, **kwargs):
         # See: https://github.com/tqdm/tqdm#redirecting-writing
         self.orig_std = sys.stdout, sys.stderr

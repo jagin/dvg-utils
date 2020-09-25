@@ -16,12 +16,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("-cf", "--conf", default="config/detect_face_image.yml",
                         help="Path to the input configuration file (default: config/detect_face_image.yml)")
-    parser.add_argument("-i", "--input", required=True, type=str,
-                        help="image file or images input path")
-    parser.add_argument("-ie", "--image-ext", default="jpg", choices=["jpg", "png"],
-                        help="image extension (default: jpg)")
-    parser.add_argument("-c", "--contains", type=str,
-                        help="image name should contain given string")
+    parser.add_argument("-cfo", "--conf-overwrites", nargs="+", type=str)
     parser.add_argument("-o", "--output", type=str,
                         help="path to output directory")
     parser.add_argument("--no-display", dest='display', action="store_false",
@@ -36,12 +31,12 @@ def parse_args():
 
 def detect_face(args):
     logger = logging.getLogger(__name__)
-    conf = load_config(args["conf"])
+    conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup processing modules
-    image_capture = ImageCapture(args["input"], "." + args["image_ext"], args["contains"])
+    image_capture = ImageCapture(conf["imageCapture"])
     face_detector = FaceDetector(conf["faceDetector"])
-    save_image = SaveImage(args["output"], args["image_ext"]) if args["output"] else None
+    save_image = SaveImage(args["output"]) if args["output"] else None
     show_image = ShowImage("Image", delay=0) if args["display"] else None
     metrics = Metrics().start()
     progress = Progress(disable=not args["progress"])
@@ -55,13 +50,11 @@ def detect_face(args):
                 break
 
             # Get rid of input path from filename
-            if args["input"] != filename:
+            if conf["imageCapture"]["path"] != filename:
                 # Get rid of input path from filename
-                filename = os.path.relpath(filename, start=args["input"])
+                filename = os.path.relpath(filename, start=conf["imageCapture"]["path"])
             else:
                 filename = os.path.basename(filename)
-            # Getting the name of the file without the extension
-            name = os.path.splitext(filename)[0]
 
             # Detect faces
             face_locations = face_detector.detect(image)
@@ -74,7 +67,7 @@ def detect_face(args):
             visualize_face_locations(image, face_locations)
 
             if save_image:
-                save_image(image, name)
+                save_image(image, filename)
 
             if show_image:
                 show = show_image(image)
@@ -127,13 +120,13 @@ class VisualizeDataPipe:
 
 def detect_face_pipeline(args):
     logger = logging.getLogger(__name__)
-    conf = load_config(args["conf"])
+    conf = load_config(args["conf"], args["conf_overwrites"])
 
     # Setup pipeline steps
-    capture_image_pipe = CaptureImagePipe(args["input"], "." + args["image_ext"], args["contains"])
+    capture_image_pipe = CaptureImagePipe(conf["imageCapture"])
     detect_face_pipe = DetectFacePipe(conf["faceDetector"])
     visualize_data_pipe = VisualizeDataPipe("vis_image")
-    save_image_pipe = SaveImagePipe("vis_image", args["output"], args["image_ext"]) if args["output"] else None
+    save_image_pipe = SaveImagePipe("vis_image", args["output"]) if args["output"] else None
     show_image_pipe = ShowImagePipe("vis_image", "Video", delay=0) if args["display"] else None
     metrics_pipe = MetricsPipe()
     progress_pipe = ProgressPipe(disable=not args["progress"])

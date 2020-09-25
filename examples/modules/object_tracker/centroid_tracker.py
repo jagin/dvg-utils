@@ -4,7 +4,7 @@ import numpy as np
 
 
 class CentroidTracker:
-    def __init__(self, max_disappeared=50, max_distance=50):
+    def __init__(self, max_disappeared=20, max_distance=80):
         # Initialize the next unique object ID along with three ordered dictionaries used to keep track of mapping
         # a given object ID to its centroid, its bounding box dimensions and number of consecutive frames it has
         # been marked as "disappeared", respectively

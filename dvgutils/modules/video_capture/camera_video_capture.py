@@ -75,7 +75,6 @@ class CameraVideoCapture:
 
 
 class CameraVideoCaptureThreaded(CameraVideoCapture):
-
     def __init__(self, src=0, api_preference=None, fourcc=None, resolution=None, fps=None, transform=None,
                  queue_size=5, name="StreamVideoCaptureThreaded"):
         super().__init__(src, api_preference, fourcc, resolution, fps, transform)

@@ -12,6 +12,10 @@ init:
 test:
 	python -m pytest
 
+dist-test: clean
+	python setup.py sdist
+	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
 dist: clean
 	python setup.py sdist
-	twine upload --repository pypi dist/*
+	twine upload dist/*

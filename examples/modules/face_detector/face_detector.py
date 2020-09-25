@@ -6,6 +6,9 @@ class FaceDetector:
         elif conf["model"] == "caffe":
             from .caffe_face_detector import CaffeFaceDetector
             self.detector = CaffeFaceDetector(**conf["caffe"])
+        elif conf["model"] == "dlib":
+            from .dlib_face_detector import DlibFaceDetector
+            self.detector = DlibFaceDetector()
         else:
             raise RuntimeError(f"FaceDetector not initialized. Unknown model {conf['model']}!")
 

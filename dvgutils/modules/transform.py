@@ -3,7 +3,6 @@ from ..vis import resize
 
 
 class Transform:
-
     def __init__(self, conf):
         self.conf = conf
 
