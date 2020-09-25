@@ -1,4 +1,4 @@
-# Unreleased
+# 0.1.2
 ## Fixed
 - Bug in vis.resize not accepting both width and height
 - Bug in vis.put_text with wrong padding handling
